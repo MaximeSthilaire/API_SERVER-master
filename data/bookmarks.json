@@ -1,0 +1,14 @@
+[
+    {
+        "Id": 1,
+        "Name": "Youtube",
+        "Url": "https://www.youtube.com",
+        "Category": "Video"
+    },
+    {
+        "Id": 2,
+        "Name": "Google",
+        "Url": "https://www.google.ca",
+        "Category": "News"
+    }
+]
