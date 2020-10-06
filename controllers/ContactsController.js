@@ -14,23 +14,57 @@ class ContactsController extends require('./Controller') {
         else
             this.response.JSON(this.contactsRepository.getAll());
     }
+    invalidPhone(phone) {
+        let r = /^(\()?\d{3}(\))?(-|\s)?\d{3}(-|\s)\d{4}$/;
+        return !r.test(phone);
+    }
+    contactAlreadyExists(name) {
+        let contacts = this.contactsRepository.getAll();
+        for(let i = 0; i < contacts.length; i++) {
+            if(contacts[i].Name === name)
+                return true;
+        }
+        return false;
+    }
+    contactAlreadyExistsPut(contact) {
+        let contacts = this.contactsRepository.getAll();
+        for(let i = 0; i < contacts.length; i++) {
+            if(contact.Id !== contacts[i].Id)
+                if(contacts[i].Name === contact.Name)
+                    return true;
+        }
+        return false;
+    }
     // POST: api/contacts body payload[{"Id": 0, "Name": "...", "Email": "...", "Phone": "..."}]
     post(contact){  
-        // todo : validate contact before insertion
-        // todo : avoid duplicates
-        let newContact = this.contactsRepository.add(contact);
-        if (newContact)
-            this.response.created(JSON.stringify(newContact));
-        else
-            this.response.internalError();
+        if((contact.Name === "" || contact.Name === undefined) || 
+            (contact.Email === "" || contact.Email === undefined) || 
+                (this.invalidPhone(contact.Phone)) || contact.Phone === undefined) {
+                    this.response.badRequest();
+        }
+        else if(this.contactAlreadyExists(contact.Name)) {
+            this.response.conflict();
+        }
+        else {
+            this.response.created(JSON.stringify(this.contactsRepository.add(contact)));
+        }
     }
     // PUT: api/contacts body payload[{"Id":..., "Name": "...", "Email": "...", "Phone": "..."}]
     put(contact){
-        // todo : validate contact before updating
-        if (this.contactsRepository.update(contact))
-            this.response.ok();
-        else 
-            this.response.notFound();
+        if((contact.Name === "" || contact.Name === undefined) || 
+            (contact.Email === "" || contact.Email === undefined) || 
+                (this.invalidPhone(contact.Phone)) || contact.Phone === undefined) {
+                    this.response.badRequest();
+        }
+        else if(this.contactAlreadyExists(contact.Name)) {
+            this.response.conflict();
+        }
+        else {
+            if (this.contactsRepository.update(contact))
+                this.response.ok();
+            else 
+                this.response.notFound();
+        }
     }
     // DELETE: api/contacts/{id}
     remove(id){
