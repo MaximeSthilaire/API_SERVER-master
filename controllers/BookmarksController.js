@@ -134,6 +134,15 @@ class BookmarksController extends require('./Controller') {
         }
         return false;
     }
+    bookmarkAlreadyExistsPut(bookmark) {
+        let bookmarks = this.bookmarksRepository.getAll();
+        for(let i = 0; i < bookmarks.length; i++) {
+            if(bookmark.Id !== bookmarks[i].Id)
+                if(bookmarks[i].Name === bookmark.Name)
+                    return true;
+        }
+        return false;
+    }
     // POST: api/bookmarks body payload[{"Id": 0, "Name": "...", "Url": "...", "Category": "..."}]
     post(bookmark) {
         if((bookmark.Name === "" || bookmark.Name === undefined) || 
@@ -150,11 +159,20 @@ class BookmarksController extends require('./Controller') {
     }
     // PUT: api/bookmarks body payload[{"Id": 0, "Name": "...", "Url": "...", "Category": "..."}]
     put(bookmark) {
-        // todo : validate bookmark before updating
-        if (this.bookmarksRepository.update(bookmark))
-            this.response.ok();
-        else 
-            this.response.notFound();
+        if((bookmark.Name === "" || bookmark.Name === undefined) || 
+        (bookmark.Category === "" || bookmark.Category === undefined) || 
+            (this.invalidUrl(bookmark.Url)) || bookmark.Url === undefined) {
+                this.response.badRequest();
+        }
+        else if(this.bookmarkAlreadyExistsPut(bookmark)) {
+            this.response.conflict();
+        }
+        else {
+            if (this.bookmarksRepository.update(bookmark))
+                this.response.ok();
+            else 
+                this.response.notFound();
+        }
     }
     // DELETE: api/bookmarks/{id}
     remove(id) {
