@@ -10,5 +10,11 @@
         "Name": "Google",
         "Url": "https://www.google.ca",
         "Category": "News"
+    },
+    {
+        "Id": 2,
+        "Name": "Autre Google",
+        "Url": "https://www.google.ca",
+        "Category": "search"
     }
 ]

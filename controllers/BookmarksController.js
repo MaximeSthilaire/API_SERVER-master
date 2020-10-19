@@ -101,6 +101,9 @@ class BookmarksController extends require('./Controller') {
             }
         }
         if('sort' in params){
+            if(resultat.length === 0){
+                resultat = data;
+            }
             if(params.sort === 'name') {
                 resultat.sort((a, b) => a.Name.localeCompare(b.Name));
             }
